@@ -1,0 +1,31 @@
+{
+  "name": "fishspots",
+  "version": "0.0.1",
+  "description": "",
+  "main": "vite.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mhd-bnt/fishspots.git"
+  },
+  "keywords": [],
+  "author": "Mehdi",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Mhd-bnt/fishspots/issues"
+  },
+  "homepage": "https://github.com/Mhd-bnt/fishspots#readme",
+  "devDependencies": {
+    "@biomejs/biome": "2.3.11",
+    "vite": "^7.3.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}
