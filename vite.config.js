@@ -4,7 +4,7 @@ export default defineConfig({
   root: "./src",
   build: {
     outDir: "../dist",
-    emptyOutDir: true, // Pour supprimer le warning
+    emptyOutDir: true,
   },
   server: {
     port: 3000,
