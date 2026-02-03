@@ -1,7 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
 body {
@@ -148,14 +151,21 @@ body {
 /* Spot List */
 .spot-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(355px, 1fr));
+  gap: 1.3rem;
+  padding: 3rem;
 }
 
 /* Spot Card */
 .spot-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+
+  justify-self: center;
+
+  max-height: 350px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition:
@@ -170,7 +180,7 @@ body {
 
 .spot-card__image {
   position: relative;
-  height: 180px;
+  height: 270px;
   overflow: hidden;
 }
 
@@ -184,52 +194,50 @@ body {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-}
 
+  width: 2.5rem;
+  height: 2.5rem;
+
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(199, 198, 198, 0.7);
+  color: rgb(41, 40, 40);
+  font-size: 0.875rem;
+
+  padding: 0;
+}
+.heart-svg {
+  width: 20px;
+  height: 20px;
+  max-width: 60%;
+  max-height: 60%;
+}
 .spot-card__content {
   padding: 1rem;
+  height: 180px;
+  text-align: left;
 }
 
 .spot-card__title {
   font-size: 1.125rem;
-  margin-bottom: 0.5rem;
-  color: #1a5276;
+  margin-bottom: 0.9rem;
+  color: rgb(23, 26, 31); /* neutral-900 */
 }
 
 .spot-card__fish {
   display: flex;
+
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
-.fish-tag {
-  background: #e8f4f8;
-  color: #2e86ab;
-  padding: 0.125rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-}
-
-.spot-card__rating {
+.spot-card__info {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.stars {
-  color: #f39c12;
-}
-
-.rating-value {
-  font-weight: bold;
-  color: #666;
+  gap: 6px;
 }
 
 .spot-card__link {

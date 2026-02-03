@@ -1,5 +1,9 @@
+import heartSvg from "../assets/lucide-Heart-Outlined.svg";
+import localisationSvg from "../assets/lucide-MapPin-Outlined.svg";
+import fishSvg from "../assets/lucide-Fish-Outlined.svg";
+
 export function SpotCard(props) {
-  const { id, name, type, fish = [], rating, image } = props;
+  const { id, name, type, fish = [], rating, image, localisation } = props;
 
   // Génération des étoiles pour la note
   const stars =
@@ -9,25 +13,31 @@ export function SpotCard(props) {
     <article class="spot-card">
       <div class="spot-card__image">
         <img src="${image}" alt="${name}" loading="lazy" />
-        <span class="spot-card__type">${type}</span>
+        <span class="spot-card__type"><img src=${heartSvg} alt="" class="heart-svg" />
+</span>
       </div>
 
       <div class="spot-card__content">
         <h3 class="spot-card__title">${name}</h3>
 
-        <div class="spot-card__fish">
-          ${fish.map((f) => `<span class="fish-tag">${f}</span>`).join("")}
-        </div>
+    
 
-        <div class="spot-card__rating">
-          <span class="stars">${stars}</span>
-          <span class="rating-value">${rating.toFixed(1)}</span>
-        </div>
 
-        <a href="/spots/${id}" data-link class="spot-card__link">
-          Voir le détail &rarr;
-        </a>
-      </div>
-    </article>
+
+<div class="info-container">
+<div class="spot-card__info">
+  <span><img src="${localisationSvg}" alt=""></span>
+  <p>${localisation}</p>
+</div>
+<div class="spot-card__info">
+  <span><img src="${fishSvg}" alt=""></span>
+  <p>${fish[0]}</p>
+</div>
+</div>
+
+
+ </div>
+   </article>
+  
   `;
 }

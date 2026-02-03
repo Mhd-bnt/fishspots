@@ -5,6 +5,7 @@ function getMockSpots() {
   return [
     {
       id: 1,
+      localisation: "Canada",
       name: "Lac de la Forêt",
       type: "Lac",
       fish: ["Carpe", "Brochet"],
@@ -13,6 +14,8 @@ function getMockSpots() {
     },
     {
       id: 2,
+      localisation: "France, Lyon",
+
       name: "Rivière du Moulin",
       type: "Rivière",
       fish: ["Truite", "Perche"],
@@ -21,6 +24,8 @@ function getMockSpots() {
     },
     {
       id: 3,
+      localisation: "Canada",
+
       name: "Étang des Saules",
       type: "Étang",
       fish: ["Carpe", "Sandre"],
@@ -29,6 +34,8 @@ function getMockSpots() {
     },
     {
       id: 4,
+      localisation: "Suisse",
+
       name: "Canal Saint-Martin",
       type: "Canal",
       fish: ["Perche", "Silure"],
