@@ -1,136 +1,128 @@
 class Router {
-  constructor() {
-    this.routes = {};
+  constructor({ rootId = "app", linkSelector = "a[data-link]" } = {}) {
+    this.routes = [];
+    this.notFoundView = () => "<h1>404 - Page not found</h1>";
 
-    this.notFoundHandler = () => "<h1>404 - Page non trouvée</h1>";
+    this.rootId = rootId;
+    this.linkSelector = linkSelector;
 
-    window.addEventListener("popstate", () => {
-      this.handleRoute(window.location.pathname);
-    });
+    this.appElement = null;
   }
 
-  /**
-   * Register a route
-   *
-   * @param {string} path - The path of the route (ex: '/spots/:id')
-   * @param {Function} handler - The function that returns the HTML of the page
-   */
-  addRoute(path, handler) {
-    this.routes[path] = handler;
-
-    return this; // Allow chaining
+  addRoute(pathPattern, viewFn) {
+    const { regex, paramKeys } = compilePathPattern(pathPattern);
+    this.routes.push({ regex, paramKeys, viewFn });
+    return this; // chaining
   }
 
-  /**
-   * Set the handler for the not found page
-   *
-   * @param {Function} handler - The function that returns the HTML of the not found page
-   */
-  setNotFound(handler) {
-    this.notFoundHandler = handler;
-
+  setNotFound(viewFn) {
+    this.notFoundView = viewFn;
     return this;
   }
 
-  /**
-   * Navigate to a URL
-   *
-   * @param {string} path - The path to navigate to
-   */
-  navigate(path) {
-    // Add the entry in the history
-    window.history.pushState({}, "", path);
-    // Handle the route
-    this.handleRoute(path);
+  navigateTo(targetPath) {
+    const normalizedPath = normalizePath(targetPath);
+
+    history.pushState(null, "", normalizedPath);
+
+    // CUSTOM
+    this.renderRoute(normalizedPath);
   }
 
-  /**
-   * Handle the display of the current route
-   *
-   * @param {string} path - The path to display
-   */
-  handleRoute(path) {
-    // First check for an exact match
-    if (this.routes[path]) {
-      this.render(this.routes[path]());
+  renderRoute(path = location.pathname) {
+    const normalizedPath = normalizePath(path);
+
+    const appElement =
+      this.appElement ||
+      (this.appElement = document.getElementById(this.rootId));
+    if (!appElement) return;
+
+    for (const routeEntry of this.routes) {
+      const matchResult = routeEntry.regex.exec(normalizedPath);
+      if (!matchResult) continue;
+
+      const params = routeEntry.paramKeys.reduce((acc, key, index) => {
+        acc[key] = matchResult[index + 1]; // index+1 car 0 = match complet
+        return acc;
+      }, {});
+
+      appElement.innerHTML = routeEntry.viewFn(params);
       return;
     }
 
-    // Then check for a route with parameters (ex: /spots/:id)
-    for (const route in this.routes) {
-      const params = this.#matchRoute(route, path);
-
-      if (params) {
-        this.render(this.routes[route](params));
-        return;
-      }
-    }
-
-    // No route found
-    this.render(this.notFoundHandler());
+    appElement.innerHTML = this.notFoundView();
   }
 
-  /**
-   * Compare a route pattern with a real path
-   *
-   * @param {string} routePattern - The pattern (ex: '/spots/:id')
-   * @param {string} path - The real path (ex: '/spots/42')
-   * @returns {Object|null} - The extracted parameters or null
-   */
-  #matchRoute(routePattern, path) {
-    // Convert the pattern to a regex
-    // /spots/:id becomes /spots/([^/]+)
-    const paramNames = [];
-    const regexPattern = routePattern.replace(/:([^/]+)/g, (_, paramName) => {
-      paramNames.push(paramName);
-      return "(\\d+)";
-    });
-
-    const regex = new RegExp(`^${regexPattern}$`);
-    const match = path.match(regex);
-
-    if (!match) return null;
-
-    // Extract the values of the parameters
-    const params = {};
-    paramNames.forEach((name, index) => {
-      params[name] = match[index + 1];
-    });
-
-    return params;
-  }
-
-  /**
-   * Display the content in the main container
-   *
-   * @param {string} html - The HTML to display
-   */
-  render(html) {
-    const app = document.getElementById("app");
-
-    if (app) {
-      app.innerHTML = html;
-    }
-  }
-
-  /**
-   * Start the router on the current route
-   */
   start() {
-    // Intercept clicks on links
-    document.addEventListener("click", (e) => {
-      // Check if it's an internal link
-      if (e.target.matches("[data-link]")) {
-        e.preventDefault();
+    this.renderRoute();
 
-        this.navigate(e.target.getAttribute("href"));
-      }
+    addEventListener("popstate", () => this.renderRoute());
+
+    document.body.addEventListener("click", (e) => {
+      const isModifiedClick =
+        e.defaultPrevented ||
+        e.button !== 0 ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.shiftKey ||
+        e.altKey;
+
+      if (isModifiedClick) return;
+
+      const clickedLink = e.target.closest(this.linkSelector);
+      if (!clickedLink) return;
+
+      const linkUrl = new URL(
+        clickedLink.getAttribute("href"),
+        location.origin,
+      );
+      if (linkUrl.origin !== location.origin) return;
+
+      e.preventDefault();
+
+      this.navigateTo(linkUrl.pathname);
     });
-
-    // Handle the initial route
-    this.handleRoute(window.location.pathname);
   }
 }
 
-// Export a unique instance (Singleton)
+// ------------------ Helpers (CUSTOM) ------------------
+
+function normalizePath(path) {
+  // CUSTOM util, mais utilise des NATIFS JS (String, regex)
+  const rawPath = String(path || "/");
+  const withLeadingSlash = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
+  return withLeadingSlash !== "/" ? withLeadingSlash.replace(/\/+$/, "") : "/";
+}
+
+function escapeRegex(text) {
+  // CUSTOM util
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function compilePathPattern(pathPattern) {
+  // CUSTOM: transforme "/spots/:id" en regex + ["id"]
+  if (pathPattern === "/") return { regex: /^\/$/, paramKeys: [] };
+
+  const paramKeys = [];
+
+  const pathParts = normalizePath(pathPattern)
+    .slice(1) // retire le premier "/"
+    .split("/")
+    .map((segment) => {
+      // NATIF JS: RegExp.exec
+      const paramMatch = /^:(\w+)(?:\((.+)\))?$/.exec(segment);
+
+      // segment normal → on l’échappe
+      if (!paramMatch) return escapeRegex(segment);
+
+      // segment param → on le capture
+      const [, paramName, customPattern] = paramMatch;
+      paramKeys.push(paramName);
+      return `(${customPattern || "[^/]+"})`;
+    });
+
+  const regex = new RegExp(`^\\/${pathParts.join("\\/")}$`);
+  return { regex, paramKeys };
+}
+
 export const router = new Router();

@@ -8,6 +8,7 @@ export const ROUTES = {
   ADD_SPOT: "/spots/new",
   FAVORITES: "/favorites",
   SEARCH: "/search",
+  ABOUT: "/about",
 };
 
 export const FISH_TYPES = [
